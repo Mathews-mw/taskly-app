@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
-import 'package:taskly/components/create-task-form.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import 'package:taskly/app_routes.dart';
 import 'package:taskly/components/task_card.dart';
-import 'package:taskly/providers/tasks-provider.dart';
 import 'package:taskly/theme/colors/app_colors.dart';
-import 'package:taskly/utils/app_routes.dart';
+import 'package:taskly/providers/tasks-provider.dart';
+import 'package:taskly/models/custom-notification.dart';
+import 'package:taskly/components/create-task-form.dart';
+import 'package:taskly/services/notifications_service.dart';
 
 class TodayTasksScreen extends StatefulWidget {
   const TodayTasksScreen({super.key});
@@ -65,8 +68,7 @@ class _TodayTasksScreenState extends State<TodayTasksScreen> {
       body: RefreshIndicator(
         onRefresh: () => _refreshTasks(context),
         child: FutureBuilder(
-          future: Provider.of<TasksProvider>(context, listen: false)
-              .loadTodayTasks(),
+          future: Provider.of<TasksProvider>(context).loadTodayTasks(),
           builder: (ctx, snapshot) => snapshot.connectionState ==
                   ConnectionState.waiting
               ? Center(
@@ -74,7 +76,8 @@ class _TodayTasksScreenState extends State<TodayTasksScreen> {
                 )
               : Consumer<TasksProvider>(
                   child: Center(
-                      child: const Text('There are no tasks for today.')),
+                    child: const Text("You don't have any tasks today yet."),
+                  ),
                   builder: (ctx, tasksProvider, child) {
                     if (tasksProvider.itemsAmount == 0) {
                       return child!;

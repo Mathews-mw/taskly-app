@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:taskly/components/task_card.dart';
 import 'package:taskly/providers/tasks-provider.dart';
 import 'package:taskly/theme/colors/app_colors.dart';
-import 'package:taskly/utils/app_routes.dart';
+import 'package:taskly/app_routes.dart';
 
 class UpcomingTasksScreen extends StatefulWidget {
   const UpcomingTasksScreen({super.key});
@@ -66,9 +66,14 @@ class _UpcomingTasksScreenState extends State<UpcomingTasksScreen> {
                 child: SpinKitFoldingCube(color: AppColors.contentBrand),
               )
             : Consumer<TasksProvider>(
-                child: Center(
-                  child: const Text(
-                      'Everything is fine here. You have no upcoming task in the moment.'),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Center(
+                    child: const Text(
+                      "Everything is fine here. You don't have any upcoming tasks in the moment.",
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
                 builder: (ctx, tasksProvider, child) {
                   if (tasksProvider.itemsAmount == 0) {

@@ -1,7 +1,7 @@
 import 'package:taskly/models/sub-task.dart';
 
 class Task {
-  final String id;
+  final int id;
   final String title;
   final String? description;
   final DateTime date;
@@ -9,7 +9,7 @@ class Task {
   final bool reminder;
   final DateTime? reminderTime;
   bool isCompleted;
-  final List<SubTask>? subTasks;
+  List<SubTask> subTasks;
 
   Task({
     required this.id,
@@ -20,7 +20,7 @@ class Task {
     this.reminder = false,
     this.reminderTime,
     this.isCompleted = false,
-    this.subTasks,
+    this.subTasks = const [],
   });
 
   set title(String title) {
@@ -53,6 +53,6 @@ class Task {
 
   @override
   String toString() {
-    return 'Task(title: $title, description: $description, date: $date, priority: $priority, reminder: $reminder, reminderTime: $reminderTime, isCompleted: $isCompleted)';
+    return 'Task(title: $title, description: $description, date: $date, priority: $priority, reminder: $reminder, reminderTime: $reminderTime, isCompleted: $isCompleted), subTasks: $subTasks';
   }
 }

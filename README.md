@@ -1,4 +1,4 @@
-# taskly
+# Taskly
 
 A new Flutter project.
 

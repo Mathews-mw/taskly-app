@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:taskly/screens/today_tasks_screen.dart';
 import 'package:taskly/screens/upcoming.tasks_screen.dart';
+import 'package:taskly/services/notifications_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +13,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // checkNotification();
+  }
+
+  checkNotification() async {
+    await Provider.of<NotificationsService>(context, listen: false)
+        .checkForNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {

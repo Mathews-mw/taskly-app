@@ -101,16 +101,16 @@ class _CreateTaskFormState extends State<CreateTaskForm>
       await Provider.of<TasksProvider>(context, listen: false)
           .saveTask(data: formData);
 
+      if (mounted) {
+        Navigator.pop(context);
+      }
+
       setState(() {
         isLoading = false;
         _selectedTime = null;
         _selectedDate = DateTime.now();
         formData.clear();
       });
-
-      if (mounted) {
-        Navigator.pop(context);
-      }
     } catch (err) {
       setState(() => isLoading = false);
       print('Error while try to create a task: $err');
@@ -168,7 +168,7 @@ class _CreateTaskFormState extends State<CreateTaskForm>
                   padding: MediaQuery.of(context).viewInsets,
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -310,7 +310,7 @@ class _CreateTaskFormState extends State<CreateTaskForm>
                                       child: Icon(IconlyLight.send),
                                     ),
                                   ),
-                          )
+                          ),
                         ],
                       ),
                     ),

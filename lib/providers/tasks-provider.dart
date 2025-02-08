@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:taskly/models/task.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+
+import 'package:taskly/app_routes.dart';
+import 'package:taskly/models/task.dart';
 import 'package:taskly/data/app_database.dart';
+import 'package:taskly/models/custom-notification.dart';
 import 'package:taskly/utils/format_date_to_sqlite.dart';
+import 'package:taskly/providers/sub-tasks-provider.dart';
+import 'package:taskly/services/notifications_service.dart';
 
 class TasksProvider with ChangeNotifier {
+  final NotificationsService notificationsService;
+  final SubTasksProvider subTasksProvider;
+
+  TasksProvider(
+      {required this.notificationsService, required this.subTasksProvider});
+
   List<Task> _items = [];
 
   List<Task> get items {
@@ -17,6 +28,8 @@ class TasksProvider with ChangeNotifier {
 
   List<Task> _mapperDatabaseToObject(List<Map<String, dynamic>> data) {
     return _items = data.map((item) {
+      final subTasks = subTasksProvider.getSubTasksByTaskId(item['id']);
+
       final task = Task(
         id: item['id'],
         title: item['title'],
@@ -28,6 +41,7 @@ class TasksProvider with ChangeNotifier {
             ? DateTime.parse(item['reminderTime'])
             : null,
         isCompleted: item['isCompleted'] == 1 ? true : false,
+        subTasks: subTasks,
       );
 
       return task;
@@ -116,8 +130,8 @@ class TasksProvider with ChangeNotifier {
 
     final task = Task(
       id: hasId
-          ? data['id'] as String
-          : DateTime.now().microsecondsSinceEpoch.toString(),
+          ? data['id'] as int
+          : DateTime.now().microsecondsSinceEpoch.remainder(10000000),
       title: data['title'] as String,
       description: data['description'] as String?,
       priority: data['priority'] as int,
@@ -160,6 +174,17 @@ class TasksProvider with ChangeNotifier {
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
 
+    if (task.reminder && task.reminderTime != null) {
+      await notificationsService.showSchedulingNotification(CustomNotification(
+        id: task.id,
+        title: task.title,
+        body:
+            'You have a task due now. Click on the notification for more details.',
+        payload: AppRoutes.HOME,
+        schedule: task.reminderTime,
+      ));
+    }
+
     print('inserted rows: $result');
 
     notifyListeners();
@@ -193,6 +218,18 @@ class TasksProvider with ChangeNotifier {
         whereArgs: [task.id],
       );
 
+      if (task.reminder && task.reminderTime != null) {
+        await notificationsService
+            .showSchedulingNotification(CustomNotification(
+          id: task.id,
+          title: task.title,
+          body:
+              'You have a task due now. Click on the notification for more details.',
+          payload: AppRoutes.HOME,
+          schedule: task.reminderTime,
+        ));
+      }
+
       print('updated rows: $result');
 
       notifyListeners();
@@ -205,6 +242,8 @@ class TasksProvider with ChangeNotifier {
     final index = _items.indexWhere((item) => item.id == task.id);
 
     if (index >= 0) {
+      await notificationsService.cancelNotification(task.id);
+
       final taskToRemove = _items[index];
       _items.remove(taskToRemove);
       _items.removeWhere((item) => item.id == taskToRemove.id);

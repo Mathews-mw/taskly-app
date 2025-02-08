@@ -30,7 +30,7 @@ class _LateTasksScreenState extends State<LateTasksScreen> {
             : Consumer<TasksProvider>(
                 child: Center(
                   child: const Text(
-                      'Everything is up to date. You have no overdue tasks.'),
+                      "Everything is up to date. You don't have any overdue tasks."),
                 ),
                 builder: (ctx, tasksProvider, child) {
                   if (tasksProvider.itemsAmount == 0) {

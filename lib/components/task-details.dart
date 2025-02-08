@@ -1,62 +1,61 @@
-import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
-import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:taskly/components/edit-task-form.dart';
+import 'package:hugeicons/hugeicons.dart';
+
 import 'package:taskly/models/task.dart';
-import 'package:taskly/providers/tasks-provider.dart';
+import 'package:taskly/providers/sub-tasks-provider.dart';
 import 'package:taskly/theme/colors/app_colors.dart';
+import 'package:taskly/providers/tasks-provider.dart';
+import 'package:taskly/components/edit-task-form.dart';
+import 'package:taskly/components/create-sub-task-form.dart';
 
 class TaskDetails extends StatelessWidget {
   final Task task;
   final Color priorityColor;
+  final ScrollController scrollController; // scrollable controller
 
   const TaskDetails({
     super.key,
     required this.task,
     required this.priorityColor,
+    required this.scrollController,
   });
 
   _handleAddSubTask(BuildContext ctx) {
     return showModalBottomSheet(
       context: ctx,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16),
-          child: Form(
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration:
-                      InputDecoration(labelText: 'Typing Sub-task name...'),
-                ),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton.filled(
-                    onPressed: () {},
-                    icon: Icon(IconlyLight.send),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
+        return CreateSubTaskForm(task: task);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final subTasksProvider = Provider.of<SubTasksProvider>(context);
+    final subTasks = subTasksProvider.getSubTasksByTaskId(task.id);
+
     return SingleChildScrollView(
-      child: Container(
+      controller: scrollController, // Conectando o controlador
+      child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).hintColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                ),
+                height: 4,
+                width: 80,
+                margin: const EdgeInsets.symmetric(vertical: 10),
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -113,10 +112,36 @@ class TaskDetails extends StatelessWidget {
               ],
             ),
             const Divider(),
-            Text(
-              'Sub-tasks',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text("Sub-tasks", style: Theme.of(context).textTheme.titleMedium),
+            subTasks.isEmpty
+                ? const Center(child: Text("You don't have any sub-tasks"))
+                : ListView.builder(
+                    shrinkWrap:
+                        true, // Permite que a ListView cresça conforme os itens
+                    physics:
+                        NeverScrollableScrollPhysics(), // Impede rolagem interna, deixando o modal rolar
+                    itemCount: subTasks.length,
+                    itemBuilder: (ctx, index) {
+                      return ListTile(
+                        titleAlignment: ListTileTitleAlignment.top,
+                        leading: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.circle_outlined),
+                        ),
+                        title: Text(
+                          subTasks[index].title,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.close,
+                            size: 18,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
             const SizedBox(height: 20),
             Center(
               child: TextButton.icon(

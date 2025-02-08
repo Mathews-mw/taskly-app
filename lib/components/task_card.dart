@@ -37,10 +37,19 @@ class TaskCard extends StatelessWidget {
   _taskDetailsBottomSheet(BuildContext ctx) {
     return showModalBottomSheet(
       context: ctx,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (BuildContext context) {
-        return TaskDetails(
-          task: task,
-          priorityColor: priorityBgColor(task.priority),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5, // Tamanho inicial do modal
+          expand: false, // Impede que ocupe todo o espaço imediatamente
+          builder: (context, scrollController) {
+            return TaskDetails(
+              task: task,
+              priorityColor: priorityBgColor(task.priority),
+              scrollController: scrollController,
+            );
+          },
         );
       },
     );

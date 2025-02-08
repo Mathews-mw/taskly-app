@@ -43,7 +43,7 @@ class AppDatabase {
       path.join(dbPath, 'taskly.db'),
       onCreate: (db, version) {
         return db.execute(
-            'CREATE TABLE ${DbTables.tasks.value} (id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT, date TEXT NOT NULL, priority INTEGER NOT NULL, reminder INTEGER NOT NULL, reminderTime TEXT, isCompleted INTEGER NOT NULL)');
+            'CREATE TABLE ${DbTables.tasks.value} (id INTEGER PRIMARY KEY, title TEXT NOT NULL, description TEXT, date TEXT NOT NULL, priority INTEGER NOT NULL, reminder INTEGER NOT NULL, reminderTime TEXT, isCompleted INTEGER NOT NULL)');
       },
       version: 1,
     );

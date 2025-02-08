@@ -9,7 +9,7 @@ import 'package:taskly/@mixins/form_validations_mixin.dart';
 import 'package:taskly/models/task.dart';
 import 'package:taskly/providers/tasks-provider.dart';
 import 'package:taskly/theme/colors/app_colors.dart';
-import 'package:taskly/utils/app_routes.dart';
+import 'package:taskly/app_routes.dart';
 
 class EditTaskForm extends StatefulWidget {
   final Task task;
@@ -104,16 +104,16 @@ class _EditTaskFormState extends State<EditTaskForm> with FormValidationsMixin {
       await Provider.of<TasksProvider>(context, listen: false)
           .saveTask(data: formData);
 
+      if (mounted) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+
       setState(() {
         isLoading = false;
         _selectedTime = null;
         _selectedDate = DateTime.now();
         formData.clear();
       });
-
-      if (mounted) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-      }
     } catch (err) {
       setState(() => isLoading = false);
       print('Error while try to create a task: $err');
